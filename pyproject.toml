@@ -1,18 +1,20 @@
 [project]
 name = "customer-support-routing-openenv"
 version = "1.0.0"
-description = "OpenEnv environment for customer support ticket routing, prioritization, and escalation."
-authors = [
-  { name = "Konireddy" }
-]
+description = "OpenEnv environment for customer support ticket routing"
+authors = [{ name = "Konireddy" }]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 dependencies = [
   "fastapi",
   "uvicorn",
   "pydantic",
+  "openenv-core>=0.2.0"
 ]
+
+[project.scripts]
+server = "server.app:app"
 
 [build-system]
 requires = ["setuptools>=61.0"]
