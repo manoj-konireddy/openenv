@@ -1,0 +1,19 @@
+[project]
+name = "customer-support-routing-openenv"
+version = "1.0.0"
+description = "OpenEnv environment for customer support ticket routing, prioritization, and escalation."
+authors = [
+  { name = "Konireddy" }
+]
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+  "fastapi",
+  "uvicorn",
+  "pydantic",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
