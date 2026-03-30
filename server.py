@@ -22,6 +22,8 @@ from pydantic import BaseModel
 from env.environment import CustomerSupportRoutingEnv
 from env.models import Action, Observation, StepResult
 from tasks.tasks import TASKS
+from typing import Optional
+
 
 # ---------------------------------------------------------------------------
 # App setup
@@ -101,12 +103,18 @@ def list_tasks() -> Dict[str, Any]:
 
 
 @app.post("/reset", response_model=Observation)
-def reset(req: ResetRequest) -> Observation:
+def reset(req: Optional[ResetRequest] = None) -> Observation:
     global _env
-    if req.task_id not in TASKS:
-        raise HTTPException(status_code=400, detail=f"Unknown task_id '{req.task_id}'")
-    _env = CustomerSupportRoutingEnv(task_id=req.task_id, seed=req.seed)
-    obs = _env.reset(seed=req.seed)
+
+    # Default values if validator sends empty POST body
+    task_id = req.task_id if req else "task1_basic_routing"
+    seed = req.seed if req else None
+
+    if task_id not in TASKS:
+        raise HTTPException(status_code=400, detail=f"Unknown task_id '{task_id}'")
+
+    _env = CustomerSupportRoutingEnv(task_id=task_id, seed=seed)
+    obs = _env.reset(seed=seed)
     return obs
 
 
