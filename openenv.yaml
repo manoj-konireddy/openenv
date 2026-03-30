@@ -1,0 +1,111 @@
+name: customer-support-routing
+version: "1.0.0"
+description: >
+  An OpenEnv environment that simulates real-world customer support ticket
+  triage. Agents must route tickets to the correct department, assign
+  appropriate priorities, and escalate tickets that meet escalation criteria.
+  Designed to benchmark LLM agents on structured decision-making tasks with
+  clear business rules and partial-progress reward shaping.
+
+author: openenv-submission
+license: MIT
+
+tags:
+  - customer-support
+  - routing
+  - triage
+  - nlp
+  - business-process
+  - openenv
+
+tasks:
+  - id: task1_basic_routing
+    name: Basic Department Routing
+    difficulty: easy
+    description: Route 5 tickets to the correct department. Priority is fixed at medium.
+    num_tickets: 5
+    max_steps: 3
+    score_range: [0.0, 1.0]
+    grader: deterministic
+
+  - id: task2_priority_routing
+    name: Priority-Aware Routing
+    difficulty: medium
+    description: Route 8 tickets to correct department AND assign correct SLA-based priority.
+    num_tickets: 8
+    max_steps: 3
+    score_range: [0.0, 1.0]
+    grader: deterministic
+
+  - id: task3_full_triage
+    name: Full Triage with Escalation
+    difficulty: hard
+    description: >
+      Route 12 tickets to correct department, assign correct priority,
+      and identify tickets requiring escalation using business escalation rules.
+    num_tickets: 12
+    max_steps: 3
+    score_range: [0.0, 1.0]
+    grader: deterministic
+
+observation_space:
+  type: object
+  fields:
+    tickets:
+      type: array
+      items:
+        type: object
+        fields:
+          ticket_id: string
+          subject: string
+          body: string
+          customer_tier: "free | pro | enterprise"
+          sentiment: "positive | neutral | negative | angry"
+          previous_contacts: integer
+          wait_time_minutes: integer
+          tags: array[string]
+    queue_stats:
+      type: object
+      fields:
+        length: integer
+        avg_wait_min: float
+        dept_load: object
+    step_number: integer
+    task_id: string
+    instructions: string
+
+action_space:
+  type: object
+  fields:
+    routings:
+      type: array
+      items:
+        type: object
+        fields:
+          ticket_id: string
+          department: "billing | technical | shipping | returns | general | escalation"
+          priority: "low | medium | high | urgent"
+          reason: string
+
+reward:
+  type: float
+  range: [-1.0, 1.0]
+  shaping:
+    - "+0.20 per ticket with correct department"
+    - "+0.10 per ticket with correct priority"
+    - "+0.15 per ticket with correct escalation decision"
+    - "+0.02 bonus for providing a non-empty reason"
+    - "-0.10 penalty for routing a ticket already routed (loop detection)"
+    - "-0.05 penalty for referencing unknown ticket IDs"
+
+endpoints:
+  reset: POST /reset
+  step: POST /step
+  state: GET /state
+  tasks: GET /tasks
+  health: GET /health
+
+runtime:
+  framework: fastapi
+  python: "3.11"
+  port: 7860
