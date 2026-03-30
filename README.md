@@ -167,7 +167,7 @@ of step rewards) for clean, reproducible evaluation metrics.
 
 ### Example: Reset
 ```bash
-curl -X POST https://your-space.hf.space/reset \
+curl -X POST https://konireddy-customer-support-routing-openenv.hf.space/reset \
   -H "Content-Type: application/json" \
   -d '{"task_id": "task1_basic_routing"}'
 ```
